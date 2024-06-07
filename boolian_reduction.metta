@@ -11,14 +11,17 @@
          )
       )
 )
-! (complement False)
+; ! (complement False)
 
-;AND Operation
+;identity Law
 
-(= (And $expr1 $expr2) 
-    (case $expr $expr2
-       (
-         ()
-       )
-    )
+(= (identity $expr) 
+     (case $expr 
+        (
+            ( (and $a False) $a )
+            ( (or $a True) $a)
+        )
+     )
 )
+
+! (identity (or a True))
