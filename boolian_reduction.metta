@@ -18,10 +18,13 @@
 (= (identity $expr) 
      (case $expr 
         (
-            ( (and $a False) $a )
-            ( (or $a True) $a)
+            ( (and $a True) $a )
+            ( (or $a False) $a)
         )
      )
 )
 
-! (identity (or a True))
+; variable expr should be a logic found in case statement. it can be expression or recursive function
+
+; ! (identity (or a True))
+
