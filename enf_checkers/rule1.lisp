@@ -54,3 +54,9 @@
 
 !(negation-checker (AND (OR a (AND (NOT (AND a a)) c)) (NOT a)))
 
+; things i learned from the above tollan code
+
+; read about `get-metatype`
+; know about ur input types(expression test cases)
+; can be done with recurssion - think that way - ur recursion format and the base cases
+; read more about metta and exercise
