@@ -58,5 +58,5 @@
 
 ; read about `get-metatype`
 ; know about ur input types(expression test cases)
-; can be done with recurssion - think that way - ur recursion format and the base cases
+; can be done with recurssion - think that way - ur recursion logic and the base cases
 ; read more about metta and exercise

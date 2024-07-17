@@ -13,55 +13,54 @@ AND(a, OR(AND(x, t), t) , AND(e, r)); True
 
 (= (alternation-checker $exp)
    (case $exp
-       (($opr $a $b)  ())
-       ((AND $a $b) ((== (get-metatype $a) Symbol)))
+
+       ((AND $a $b) () )
        ((OR $a $b) (...))
-
+       ($a (if (== (get-metatype $a) Symbol) True))
    )
 )
 
-(: alternation-checker (->$exp Bool))
 
-(= (alternation-checker $exp)
-   (case $exp
-       (
-           ; Base case: if $exp is a symbol, it is valid
-           ($a (if (== (get-metatype $a) Symbol)
-                   True
-                   (Error "Invalid expression format!")
-           ))
+ ;2. Levels of conjunction and disjunction alternate.
+(: check-alternate (-> Expression Bool))
+(= (check-alternate $exp) 
+    (case $exp
+        (
+            ( ($OP $a $b) (and  ; check for both children
+                (if (== (get-metatype $a) Expression)
+                    (case $a
+                        (
+                            (($OP $_a $_b) False)   ; if it has the same Operator as its parent
+                            ( $else (check-alternate $a))
+                        )
+                    )
+                    True    ; True if it's not an expression
+                )
 
-           ; If the operator is AND, check its arguments
-           ((AND $a $b)
-               (and
-                   (or (== (get-metatype $a) Symbol)
-                       (and (alternation-checker-arg $a OR) (alternation-checker $a)))
-                   (or (== (get-metatype $b) Symbol)
-                       (and (alternation-checker-arg $b OR) (alternation-checker $b)))
-               )
-           )
+                (if (== (get-metatype $b) Expression)
+                    (case $b
+                        (
+                            (($OP $_a $_b) False)
+                            ( $else (check-alternate $b))
+                        )
+                    )
+                    True
+                )
+            ))
 
-           ; If the operator is OR, check its arguments
-           ((OR $a $b)
-               (and
-                   (or (== (get-metatype $a) Symbol)
-                       (and (alternation-checker-arg $a AND) (alternation-checker $a)))
-                   (or (== (get-metatype $b) Symbol)
-                       (and (alternation-checker-arg $b AND) (alternation-checker $b)))
-               )
-           )
-       )
-   )
+            ( ($OP $a) (check-alternate $a) )
+
+            ( $else True)
+        )
+    )
 )
 
-(: alternation-checker-arg (->$exp $expected-opr Bool))
+;; !(check-alternate (AND (OR a b) c))
+;; !(check-alternate (AND (OR a b) (NOT c)))
+;; !(check-alternate (AND (OR a b) (OR c d)))
+;; !(check-alternate (AND (OR a (AND b c)) (OR c (AND d e))))
+;; !(check-alternate (AND (OR a b) (NOT (NOT (AND a b)))))
 
-(= (alternation-checker-arg $exp $expected-opr)
-   (case $exp
-       (
-           ; Check if the expression starts with the expected operator
-           (($expected-opr _) True)
-           (else False)
-       )
-   )
-)
+;; !(check-alternate (AND (AND a b) (OR c d)))
+;; !(check-alternate (AND (OR a (OR c b)) (OR c d)))
+;; !(check-alternate (AND (OR a b) (NOT (NOT (AND a (AND e d))))))
