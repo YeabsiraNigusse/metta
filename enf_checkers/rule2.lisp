@@ -5,7 +5,7 @@
 ; Test Cases
 OR((AND(s,d)), c); True
 AND(v, (AND(r,y))); False
-AND(a, OR(AND(x, t), t) , AND(e, r)); True
+AND(OR(a, OR(AND(x, t), t)) , AND(e, r)); True
 
 
 

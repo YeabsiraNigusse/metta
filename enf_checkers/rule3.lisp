@@ -41,47 +41,30 @@
 ; conditions to check for rule 3
 
 ; 1 check a is expression if it is go on recursion
-
+; check if an expression has expression meta type
+; if it has call the function again recursively
+; write the above condition for both input expressions which is a and b
+; pattern match if the two inputes are symbols if the are similar return false
+; pattern match for litral and its negation if yes return false 
+; implement the above both switching its position.
+;
 (: checkrule3 (-> Expression Bool))
 
 (= (checkrule3 $expr) 
    (case $expr
-
-   (
     
-    ($op $a $b) (and 
-         (if (== (get-metatype $a) Expression)
+    ($op $a $b) 
+         (if (== (get-metatype $a) Expression) (checkrule3 $a) (checkrule3 $a))
 
-              (case $a 
+    ($op $a $b) 
+         (if (== (get-metatype $b) Expression) (checkrule3 $b) (checkrule3 $b))
 
-                  (($_op $a $a) False)
-                  (($_op $a (NOT ($a))) False)
-                  (($_op (NOT ($a)) $a) False)
-                  ($else (checkrule3 $a))
-   
-              )
-              True
-   
-   )
+    ( ($op $a $b) (if (== $a $b) False True))
 
-    (if (== (get-metatype $b) Expression)
+    (($op (NOT $a) $a) False)
+    (($op $a (NOT $a)) False)
 
-              (case $b 
-
-                  (($_op $b $b) False)
-                  (($_op $b (NOT ($b))) False)
-                  (($_op (NOT ($b)) $b) False)
-                  ($else (checkrule3 $b))
-   
-              )
-              True
-   ))
-
-    ( ($op $a) (checkrule3 $a) )
-    ( $else True)
-
-
-   )   
+    
    )
 
 )
