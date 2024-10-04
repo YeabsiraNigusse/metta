@@ -19,3 +19,13 @@
     )
 )
 ! (persons-of-age 34 14)
+
+
+! (let $var (cdr-atom (AND a b)) $var)
+! (let* (
+    ($var (cdr-atom (AND a b)))
+    ($var2 (cdr-atom $var))
+    ($var3 (cdr-atom $var2))
+    )
+    $var3
+)
