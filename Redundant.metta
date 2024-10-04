@@ -36,7 +36,6 @@
         (let* (
             ($head (car-atom $expr))  ; Get the head of the current expression
             ($tail (cdr-atom $expr))  ; Get the tail of the current expression
-            (() (println! (this is head $head and this is tail $tail)))
             ($newtail (removeRedundency $symbol $tail))  ; Process the tail recursively
         )
             ; Check if the head is an expression, and process only subexpressions like AND/OR (skip NOT)
@@ -77,10 +76,9 @@
                     (and (== (get-metatype $head) Expression) (== (car-atom $head) NOT)))
                 ; If the head is a symbol or starts with NOT, apply removeRedundency
                 (let* (
-                    ($updatedexpr (removeRedundency $head $expr))  ; Remove redundancy for current symbol/NOT
-                    ($updatedtail (removeRedundencyFromSubExpressions $updatedexpr))  ; Recur with updated expression
+                    ($updatedexpr (removeRedundency $head $new-tail))  ; Remove redundancy for current symbol/NOT
                 )
-                    $updatedtail  ; Return the updated expression
+                    (cons-atom $head $updatedexpr)
                 )
                 ; Otherwise, keep processing the tail without further recursion
                 (cons-atom $head $new-tail)
@@ -93,9 +91,9 @@
 ! (removeRedundencyFromSubExpressions (AND b (OR b c) (NOT a) (OR a (OR b (NOT a)))))
 ; Expected output: (AND b (OR c) (NOT a) (OR a (OR)))
 
-; ; Test Case 2: Removing redundancies from subexpressions
-; ! (removeRedundencyFromSubExpressions (AND a b (NOT a) (OR c (NOT b) (AND b a))))
-; ; Expected output: (AND a b (NOT a) (OR c (NOT b) (AND)))
+; Test Case 2: Removing redundancies from subexpressions
+! (removeRedundencyFromSubExpressions (AND a b (NOT a) (OR c (NOT a) (AND b a))))
+; Expected output: (AND a b (NOT a) (OR c (AND)))
 
 
 
