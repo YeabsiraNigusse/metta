@@ -5,3 +5,8 @@
 : DISCONNECT ReductionSignal
 : 
 (: (reduceToElegance (-> Expression Expression Expression ReductionSignal)) )
+
+(= (reduceToElegance $current $dominantSet $commandSet) (
+    
+)
+)

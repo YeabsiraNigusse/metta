@@ -14,21 +14,66 @@
             ($newtail (removeRedundent $symbol $tail)) ; Process the tail recursively
         )
             ; If the head matches the symbol, skip it
-            (if (== $symbol $head) 
+            (if (== $symbol $head) $newtail (cons-atom $head $newtail))
+            )
+        )
+    )
+
+(= (isMember $x $tuple)
+    (if (== $tuple ()) False
+        (let*
+            (
+                ($head (car-atom $tuple))
+                ($tail (cdr-atom $tuple))
+            )
+        (
+            if (== $x $head) True (isMember $x $tail)
+        )
+)
+)
+)
+
+(: setDifference (-> Expression Expression Expression))
+(= (setDifference $dominantSet $current) 
+    (if (== $current ()) () ; Base case: return empty list when $current is empty
+        (let* (
+            ($head (car-atom $current))  ; Extract the head of the current set
+            ($tail (cdr-atom $current))  ; Extract the tail of the current set
+            ($newtail (setDifference $dominantSet $tail))  ; Recursively process the tail
+        )
+            ; Check if the $head is in the dominantSet, if so, skip it
+            (if (isMember $head $dominantSet) 
                 $newtail 
-                ; Check if $head is an expression and handle special case for (NOT ...)
-                (let $newhead 
-                    (if (and (== (get-metatype $head) Expression) 
-                             (not (== (car-atom $head) NOT))) 
-                        ; Recursively remove redundancy if not a (NOT ...) expression
-                        (removeRedundent $symbol $head) 
-                        $head)
-                    (cons-atom $newhead $newtail)
-                )
+                ; Otherwise, add the head to the new tail, avoiding unnecessary parentheses
+                (if (== (get-metatype $newtail) Expression) 
+                    (cons-atom $head $newtail)
+                    $head)  ; Avoid wrapping the head if it's already properly structured
             )
         )
     )
 )
+
+
+; (: setDifference (-> Expression Expression Expression))
+; (= (setDifference $dominantSet $current) (
+;     (if (== $current ()) ()
+;         (let* (
+;             ($head (car-atom $current))
+;             ($tail (cdr-atom $current))
+;             ($newtail (setDifference $dominantSet $tail))
+;             ; (() (println! (this is newtail $newtail)))
+;             ; (() (println! (this is head $head)))
+
+;         )
+;             (if (isMember $head $dominantSet) $newtail (cons-atom $head $newtail))
+;         )
+;     )
+; ))
+! (setDifference (a b (NOT a)) (AND a b (NOT a) c (OR a b)) )
+
+; ! (isMember 1 (1 2 3))
+; ! (cons-atom c (OR a b))
+
 
 ; Function to remove redundancy of a specific symbol from subexpressions (excluding NOT expressions)
 (= (removeRedundency $symbol $expr)
@@ -37,7 +82,7 @@
             ($head (car-atom $expr))  ; Get the head of the current expression
             ($tail (cdr-atom $expr))  ; Get the tail of the current expression
             ($newtail (removeRedundency $symbol $tail))  ; Process the tail recursively
-        )
+         )
             ; Check if the head is an expression, and process only subexpressions like AND/OR (skip NOT)
             (if (and (== (get-metatype $head) Expression)
                      (not (== (car-atom $head) NOT)))  ; Skip (NOT ...) expressions
@@ -87,48 +132,13 @@
     )
 )
 
-; Test Case 1: Removing redundancies from subexpressions
-! (removeRedundencyFromSubExpressions (AND b (OR b c) (NOT a) (OR a (OR b (NOT a)))))
-; Expected output: (AND b (OR c) (NOT a) (OR a (OR)))
+; ; Test Case 1: Removing redundancies from subexpressions
+; ! (removeRedundencyFromSubExpressions (AND b (OR b c) (NOT a) (OR a (OR b (NOT a)))))
+; ; Expected output: (AND b (OR c) (NOT a) (OR a (OR)))
 
-; Test Case 2: Removing redundancies from subexpressions
-! (removeRedundencyFromSubExpressions (AND a b (NOT a) (OR c (NOT a) (AND b a))))
-; Expected output: (AND a b (NOT a) (OR c (AND)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-; (= (redundent $expr) 
-;     (if (== $expr ()) (println! done) 
-;         (let* (
-;             ($head (car-atom $expr))
-;             ($tail (cdr-atom $expr))
-;             (() (if (== (get-metatype $head) Symbol) (println! ($head is the first symbol)) ()))
-;             (() (if (== (get-metatype $head) Symbol) (checkRedundency $head $expr) (println! ($head is not a symbol))))
-;             ; (() (println! (the metatype of $head is (get-metatype $head))))
-;             ; (() (if (== (get-metatype $head) Expression) (println! $head) ()))
-;         )
-;         (redundent $tail)
-;     )))
-
-; ! (redundent (AND b (NOT a) (OR a (OR b))))
-; ; ! (car-atom (a b))
-; ; ! (cdr-atom (cdr-atom (AND a b)))
-
-; ; ! (get-metatype (car-atom (a b)))
-; ; the logic to implement redundent function is to take the element(symbols/guardset) of the expression 
-; ; and compart wheather it exist on its children expression.
+; ; Test Case 2: Removing redundancies from subexpressions
+; ! (removeRedundencyFromSubExpressions (AND a b (NOT a) (OR c (NOT a) (AND b a))))
+; ; Expected output: (AND a b (NOT a) (OR c (AND)))
 
 
 
