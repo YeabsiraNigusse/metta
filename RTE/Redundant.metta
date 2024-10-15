@@ -29,9 +29,7 @@
         (
             if (== $x $head) True (isMember $x $tail)
         )
-)
-)
-)
+)))
 
 (: setDifference (-> Expression Expression Expression))
 (= (setDifference $dominantSet $current) 

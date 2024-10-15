@@ -301,7 +301,7 @@ def iterator(
 
     # Determine if current is a site for inconsistent Handle
     if not isConsistent(handleSet):
-        return ReductionSignal.DELETE
+        return ReductionSignal.DELETE   
 
     # Reduce each child's subtree to relative elegance
     outcome = andSubTreeIterator(
